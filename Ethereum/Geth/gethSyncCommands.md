@@ -19,3 +19,6 @@
 
   > 이 명령어는 mainnnet에 한정된 명령어다. 보통 **geth**를 실행시키면 **geth.ipc**파일이 어디에 생성되는지가 터미널(cmd)에 출력된다. 따라서 해당 경로를 copy해둔 후에 `geth attach`명령어에 활용할 수 있도록 한다.
 
+
+
+![Doge](C:\Users\waca\Documents\GitHub\TodayILearned\Ethereum\images\Doge.jpg)
