@@ -6,9 +6,66 @@ Migrations 폴더 내의 파일들은 자바스크립트 파일이며 당신이 
 
 `$ truffle migrate`프로젝트의 `migrations`폴더내의 모든 파일들에 대해 migrate를 진행할 것이다. 
 
-## INITIAL MIGRATION
+### INITIAL MIGRATION
 
 트러플은 마이그레이션 컨트랙트를 제공해준다. 컨트랙트는 반드시 특정한 인터페이스를 포함하고 있어야 한다. 대부분의 프로젝트에서 contract Migrations은 첫번째로 배포된 이후에 따로 업데이트 되거나 하지 않는다. 
+
+### DEPLOYER
+
+마이그레이션 파일들은 deployer를 활용하여 배포 업무들의 단계를 정해줄 것이다. 
+
+```
+// Stage deploying A before B
+deployer.deploy(A);
+deployer.deploy(B);
+```
+
+배포 업무들을 큐 형식으로 처리하고 싶다면, Promise문법을 활용하여 아래와 같이 작성한다.
+
+```
+// Deploy A, then deploy B, passing in A's newly deployed address
+deployer.deploy(A).then(function() {
+  return deployer.deploy(B, A.address);
+});
+```
+
+
+
+### NETWORK CONSIDERATIONS
+
+배포 단계를 네트워크에 따라 조건적으로 기술할 수도 있다. [Networks](https://truffleframework.com/docs/advanced/networks)를 참조하면 된다. 조건적으로 단계를 나누기 위해서 migrations를 아래와 같이 기술할 수 있다.
+
+```
+module.exports = function(deployer, network) {
+  if (network == "live") {
+    // Do something specific to the network named "live".
+  } else {
+    // Perform a different step otherwise.
+  }
+}
+```
+
+### AVAILABLE ACCOUNTS
+
+Migrations들은 이더리움 클라이언트 그리고 web3 provider로부터 제공된 계정들을 통과시킬 수도 있다. 컨트랙트를 배포할 때, 특정 계정들이 필요할 수도 있으니까. `web3.eth.getAccounts()`를 사용한 것과 동일한 계정 리스트다.
+
+```
+module.exports = function(deployer, network, accounts) {
+  // Use the accounts within your migrations.
+}
+```
+
+### DEPLOYER API
+
+deployer는 migrations 과정을 간편하게 해주는 여러 메서드들을 포함하고 있다.
+
+#### DEPLOYER.DEPLOY(CONTRACT, ARGS..., OPTIONS)
+
+컨트랙트 개체의 내용대로 특정 컨트랙트를 배포한다. 단 하나의 컨트랙트만이 dapp내에 존재하는 싱글톤 컨트랙트들을 다룰 때 유용하다. 이 기능은 배포 후에 컨트랙트의 주소를 설정해줄 것이다. (i.e., `Contract.address`는 새롭게 배포되는 컨트랙트의 주소를 가진다.), 그리고 전에 저장되어 있는 주소를 덮어써버린다. (override)
+
+많은 컨트랙트를 배포하기 위해, 우리는 선택적으로 컨트랙트들로 구성된 배열, 혹은 배열들을 담고 있는 배열을 보낼 수도 있다. 또한 마지막 인수는 `gas` 그리고 `from` 과 같은 다른 트랜잭션 매개 변수뿐만 아니라 `overwrite`라는 키를 포함 할 수있는 선택적 개체입니다.
+
+덮어 쓰기를 false로 설정하면 배포자는 이미 배포 된 계약이 있을 경우 이 계약을 배포하지 않는다. 이는 외부 종속성에 의해 계약 주소가 제공되는 경우에 유용합니다.
 
 
 
