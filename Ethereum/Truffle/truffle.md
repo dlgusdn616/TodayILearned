@@ -32,3 +32,6 @@ import할 때, 경로 지정 문제로 애를 많이 먹었다. `./`로 경로�
 * Are processed immediately
 * Will expose a return value
 
+## INTRODUCING ABSTRACTIONS
+
+이더리움 컨트랙트를 자바스크립트로 이용할 수 있는 것이 Contract abstractions이다. 컨트랙트와 쉽게 인터페이스할 수 있게 만든 Wrapper code라고 생각하면 된다. 이로써 우리는 엔진에 대한 이해를 하지 않고도 편하게 사용할 수 있다.  트러플은 이를 위해 자체적으로 [truffle-contract](https://github.com/trufflesuite/truffle-contract) 모듈을 사용한다. 
