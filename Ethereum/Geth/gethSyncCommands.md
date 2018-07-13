@@ -21,4 +21,4 @@
 
 
 
-![Doge](https://github.com/dlgusdn616/TodayILearned/blob/master/Ethereum/images/Doge.jpg)
+![Doge](../images/Doge.jpg)
