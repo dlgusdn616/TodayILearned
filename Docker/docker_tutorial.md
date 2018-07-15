@@ -28,6 +28,9 @@ DISTRIB_DESCRIPTION="Ubuntu 18.04 LTS"
 `BusyBox v1.28.4 (2018-05-22 17:00:17 UTC) multi-call binary.`
 
 ## Basic Concepts
+
+### 컨테이너
+
 * 각각의 VM = 서로 다른 환경
   VM은 하드웨어의 가상화: 소프트웨어로 구현된 하드웨어
 
@@ -43,4 +46,31 @@ DISTRIB_DESCRIPTION="Ubuntu 18.04 LTS"
 
 예를 들어, 본래 /bin에 있었던 bash를 가져온다고 가정해보면 bash만 가져올 것이 아니라 `ldd bash`명령어로 필요한 의존성 라이브러리들을 파악한 후에 함께 복사해와야 실행이 가능하다.
 실제로 컨테이너라는 건 **chroot**와 같은 격리기능을 좀 더 편리하게 제공해주는 것이라고 생각할 수 있다.
+
+![docker_architecture](/Users/wisecow/Documents/GitHub/TodayILearned/Docker/images/docker_architecture_02.png)
+
+도커의 경우 처음 lxc(linux container)를 이용해 격리를 했었고, 지금의 경우 libcontainer라는 라이브러리를 도커사에서 개발을 해서 사용하고 있다.
+
+`docker run -p 3306:3306 --name mysql -d mysql` 명령어로 mysql을 실행시켜보자. 도커 안에서 실행되는 포트랑 밖에서의 포트랑 연결시켜주는 옵션이 `-p 3306:3306` 옵션이다. 
+
+### 이미지
+
+* 특정 프로세스를 실행하기 위한 환경
+  * 계층화된 파일 시스템
+  * 이미지는 파일들의 집합
+  * 프로세스가 실행되는 환경도 결국 파일들의 집합
+
+### 도커 서버와 클라이언트
+
+* 리눅스 머신
+  * 컨테이너를 네이티브하게 지원해준다. 컨테이너 = 호스트의 프로세스
+  * 배포판에 따라 차이는 있지만 대부분 지원한다.
+  * 실제 도커 컨테이너 배포에는 리눅스 머신을 사용한다.
+* 맥
+  * xhyve, 직접 컨트롤 할 수는 없지만 이 위에서 서버 및 컨테이너가 존재한다.
+    * 클라이언트는 맥OS에 직접 설치되어 있다. 
+    * xhyve는 맥OS의 경량화된 가상머신이다.
+  * 호스트 머신과 자연스럽게 결합
+    * 네트워크 / 볼륨 등
+    * 호스트 머신처럼 사용 가능
 
