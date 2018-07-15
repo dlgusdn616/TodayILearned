@@ -172,3 +172,217 @@ Server:
 |    -it    | -i와 -t를 동시에 사용한 것으로 터미널 입력을 위한 옵션 |
 | --network |                     네트워크 연결                      |
 
+#### ubuntu 16.04
+
+`docker run ubuntu:16.04`
+
+`run`명령어를 사용하면 사용할 이미지가 저장되어 있는지 확인하고 없으면 다운로드(`pull`)를 한 후 컨테이너를 생성(`create`)하고 시작(`start`)한다.
+
+컨테이너는 프로세스이기 때문에 실행중인 프로세스가 없으면 컨테이너는 종료된다.
+
+#### /bin/sh
+
+`docker run --rm -it ubuntu:16.04 /bin/sh`
+
+컨테이너 내부에 들어가기 위해 `sh`를 실행하고 키보드 입력을 위해 `-it`(== -i, -t)옵션을 준다. 추가적으로 프로세스가 종료되면 컨테이너가 자동으로 삭제되도록 --rm 옵션도 추가하였다.
+
+`--rm`옵션이 없다면 컨테이너가 종료되더라도 삭제되지 않고 남아있다.
+
+#### CentOS
+
+`docker run --rm -it centos:7 /bin/sh`
+
+도커는 다양한 리눅스 배포판을 실행할 수 있다. 공통점은 모두 동일한 커널을 사용한다는 점이다. Ubuntu 또는 CentOS에 포함된 다양한 기본기능이 필요 없는 경우, Alpine이라는 초소형(약 5MB)이미지를 사용할 수도 있다.
+
+#### Web Application
+
+간단한 웹 애플리케이션을 컨테이너로 생성해본다.
+
+아래의 실습의 경우, 강사가 운영하는 서버에 접속하는 작업인데 실제로 현재 강사가 운영하는 서비스를 볼 수 없으므로..! 실습에 미흡함이 있다.
+
+#### Web Application v2
+
+```
+docker run -d \                                                                         
+> -p 4568:4567 \
+> -e ENDPOINT=https://workshop-docker-kr.herokuapp.com/ \
+> -e PARAM_NAME=waca \
+> subicura/docker-workshop-app:2
+```
+
+명령어를 여러 줄 칠 수 없기 때문에 역슬래쉬를 붙여주면서 개행을 시킨다.
+
+-d 옵션으로 백그라운드 실행을 시키고, 로컬의 4568 포트를 호스트의 4567연결을 할 것이기 때문에 로컬 호스트의 4568포트로 접속을 하면 웹 접속이 될 것이다.
+
+-e의 경우 환경변수를 넘겨주는 옵션이다. 
+
+실행시킨 후에는 자신의 ip주소:port번호(4568)를 브라우저에 입력해보자. 그러면 자신의 container의 id가 화면에 보일 것이다.
+
+옵션을 다시한 번 설명하자면, -d 옵션을 주지 않으면 실행된 상태로 멈추게 되고 -p 옵션은 4568을 컨테이너 안의 4567로 연결하겠다는 뜻이다. -e는 환경 변수를 지정하겠다는 뜻이고 총 2개의 환경변수를 지정했다. ENDPOINT라는 환경변수, 그리고 PARAM_NAME 환경변수를 각각 설정해주었다.
+
+subicura라는 계정 안에 있는 도커 워크숍 앱 2번째 버전이라는 의미다. 유명한 컨테이너 같은 경우 앞에 아이디가 없는데, 사용자가 만든 것은 앞에 아이디가 붙고 / image명이 붙고 뒤에 태그까지 붙일 수 있다.
+
+#### Web Application v3
+
+```
+docker run -d \                                                                         
+> -p 4569:4567 \
+> -e ENDPOINT=https://workshop-docker-kr.herokuapp.com/ \
+> -e PARAM_NAME=waca \
+> -e PARAM_MESSAGE=wise \
+> subicura/docker-workshop-app:3
+```
+
+실습의 의미:
+
+이미지에 태그를 달아서 누군가가 관리를 하면, 그 이미지를 가져다 쓰기만 하면 된다는 의미이다. 
+
+웹 애플리케이션이 브라우저에서 접속을 하면, 서버에다가 파라미터 값을 전달하는 프로그램인데 내부적으로 Ruby언어로 만들어져 있지만 실제 컨테이너를 사용하는 사용자 입장에서는 이런 걸 신경쓰지 않아도 된다.
+
+예전 같으면 프로그램이 어떤 언어로 만들어져있는지 알고 있어야 했지만, 이제 제작자가 이미지를 신경써서 만들기만 한다면 개발에 필요한 건 어떤 환경변수를 써야 하는지, 어떤 포트를 사용해야하는지 정도이다. 이미지 파일 자체는 이미 실행되는 이미지 이므로 안심하고 사용할 수 있다.
+
+마지막에 기술된 것이 이미지이고, 아무 설정을 넣어주지 않는다면 프로그램 자체가 실행된다. 
+
+#### Reids
+
+redis는 메모리기반의 다양한 기능을 가진 스토리지이다.
+
+`docker run -name=redis -d -p 1234:6379 redis`
+
+백그라운드로 동작하고 호스트의 1234를 컨테이너의 6379라는 포트와 연결을 해서 사용하겠다는 의미다.
+
+`telnet` 프로그램으로 테스트 해본다.
+
+```
+# mac
+docker run --rm -it mikesplain/telnet docker.for.mac.localhost 1234
+// 가상 머신에서 telnet을 실행시킨 것을 그대로 호스트에서 프로세스로 동작시키는 것과 같은 효과를 줄 수 있다.
+// telnet이라는 프로그램 자체가 컨테이너에서 실행되는 것이기 때문에, 컨테이너에서는 밖에 있는 호스트의 ip를 모르기 때문에 docker.for.mac.localhost라는 도커에서 만들어준 DNS를 활용해서 접속할 수 있다.
+// telnet은 이미지고 그 뒤에 어떤 인자를 붙일지 어떻게 아냐라고 물어본다면, 그 방법이 없기 때문에 만든 사람이 어떻게 만들었는지를 알아야 한다. 사용법은 구글링을 통해 알아내도록 하자.
+# windows
+docker run --rm -it mikesplain/telnet docker.for.win.localhost 1234
+
+set hello world
++OK
+get hello
+$5
+world
+quit
+```
+
+#### MySQL
+
+보통 명령어는 [docker hub mysql](https://hub.docker.com/_/mysql/) 를 검색해서 어떤 옵션(환경 변수)이 있는지 확인해본다.
+
+```
+docker run -d -p 3306:3306 \
+	-e MYSQL_ALLOW_EMPTY_PASSWORD=true \
+	--name mysql \
+	mysql:5.7
+```
+
+mysql에 접속하여 database를 만든다.
+
+```
+docker exec -it mysql mysql // mysql컨테이너에 접근해서 mysql커맨드를 실행시킨다.
+create database wp CHARACTER SET utf8;
+grant all privileges on wp.* to wp@'%' identified by 'wp';
+flush privileges;
+quit
+```
+
+#### exec
+
+`exec`명령어는 `run`과는 달리 실행중인 도커 컨테이너에 접속할 때 사용하며 일반적으로 컨테이너 안에 ssh server등을 설치하지 않고 exec 명령어로 접속한다.
+
+#### Wordpress
+
+```
+docker run -d -p 8080:80 \                                                              
+> -e WORDPRESS_DB_HOST=docker.for.mac.localhost \
+> -e WORDPRESS_DB_NAME=wp \
+> -e WORDPRESS_DB_USER=wp \
+> -e WORDPRESS_DB_PASSWORD=wp \
+> wordpress
+```
+
+이미지에 필요한 환경변수만 안다면, 프로세스를 빠르게 실행시킬 수 있다. `localhost:8080` 을 웹브라우저에서 확인해보자.
+
+#### ps
+
+`docker ps` 로 현재 만들어진 컨테이너 목록을 확인해보자.
+
+`docker ps -a` 옵션은 중지된 컨테이너도 출력해준다.
+
+#### stop
+
+`docker stop [OPTIONS] CONTAINER [CONTAINER...]`
+
+컨테이너 아이디 옵션을 줄 때는 앞에 3글자만 따서 입력을 해줘도 도커에서 인식을 해주기 때문에 `docker stop 395 967 38a`  등 여러 아이디를 줘서 여러 개를 중지시킬 때 유용하게 사용할 수 있다.
+
+#### rm
+
+종료 뿐만 아니라 rm 명령어로 확실히 삭제를 해주도록 한다.
+
+`docker rm 395 976 38a b50 e02 10c 1c3 ac8 b1a 8b1 d7a` 과 같이 주어 한꺼번에 여러 컨테이너를 종료시켜주었다.
+
+#### logs
+
+컨테이너가 정상적으로 동작하는지 확인하기 위해 로그를 사용한다. 
+
+`docker logs [OPTIONS] CONTAINER`
+
+`-f`, `--tail` 옵션을 함께 사용하여 좀 더 효과적으로 사용할 수 있다.
+
+#### imgaes
+
+`docker images [OPTIONS][]REPOSITORY[:TAG]]`
+
+`docker images`
+
+다운로드 된 이미지 목록을 확인할 수 있다.
+
+#### pull
+
+이미지를 다운받는 명령은 다음과 같다.
+
+`docker pull [OPTIONS] NAME[:TAG|@DIGEST]`
+
+ubuntu:14.04를 다운받기 위해서는
+
+`docker pull ubuntu:14.04`
+
+run명령어를 입력하면 이미지가 없을 때 자동으로 다운받으니 pull명령어를 언제 쓰는지 궁금할 수 있다. pull은 최신버전으로 다시 다운 받는다. 같은 태그지만 이미지가 업데이트 된 경우는 pull 명령어를 통해 새로 다운받을 수 있다.
+
+#### rmi
+
+이미지를 삭제하는 방법은 다음과 같다.
+
+`docker rmi [OPTIONS] IMAGE [IMAGE...]`
+
+imgaes 명령어를 통해 얻은 이미지 목록에서 이미지 ID를 입력하면 삭제가 된다. 단, 컨테이너가 실행중인 이미지는 삭제되지 않는다. 컨테이너는 이미지 레이어를 기반으로 실행중이므로 당연히 삭제할 수 없다.
+
+#### network create
+
+도커 컨테이너끼리 통신할 수 있는 가상 네트워크를 만든다.
+
+`docker network create [OPTIONS] NETWORK`
+
+`app-network` 라는 이름으로 wordpress와 mysql이 통신할 네트워크를 만든다.
+
+`docker network create app-network`
+
+#### network connect
+
+기존에 생성된 컨테이너에 네트워크를 추가한다.
+
+`docker network connect [OPTIONS] NETWORK CONTAINER`
+
+만들어 놓은 mysql에 네트워크를 추가한다.
+
+`docker network connect app-network mysql`
+
+
+
+
+
