@@ -47,7 +47,7 @@ DISTRIB_DESCRIPTION="Ubuntu 18.04 LTS"
   * OS에서 지원하는 기능을 사용
   * 격리된 환경에서 프로세스를 실행
 
-![docker_architecture](/Users/wisecow/Documents/GitHub/TodayILearned/Docker/images/docker_architecture_01.jpg)
+![docker_architecture](images/docker_architecture_01.jpg)
 
 도커의 컨테이너는 `하드웨어의 가상화 없이 격리된 환경에서 실행되는 프로세스`이다 . 도커의 컨테이너는 프로세스라는 점이 중요하다.
 
@@ -56,7 +56,7 @@ DISTRIB_DESCRIPTION="Ubuntu 18.04 LTS"
 예를 들어, 본래 /bin에 있었던 bash를 가져온다고 가정해보면 bash만 가져올 것이 아니라 `ldd bash`명령어로 필요한 의존성 라이브러리들을 파악한 후에 함께 복사해와야 실행이 가능하다.
 실제로 컨테이너라는 건 **chroot**와 같은 격리기능을 좀 더 편리하게 제공해주는 것이라고 생각할 수 있다.
 
-![docker_architecture](/Users/wisecow/Documents/GitHub/TodayILearned/Docker/images/docker_architecture_02.png)
+![docker_architecture](images/docker_architecture_02.png)
 
 도커의 경우 처음 lxc(linux container)를 이용해 격리를 했었고, 지금의 경우 libcontainer라는 라이브러리를 도커사에서 개발을 해서 사용하고 있다.
 
@@ -155,7 +155,7 @@ Server:
 
 
 
-![docker_environment](/Users/wisecow/Documents/GitHub/TodayILearned/Docker/images/docker_environment_01.jpg)
+![docker_environment](images/docker_environment_01.jpg)
 
 ### 3.3 컨테이너 실행하기
 
