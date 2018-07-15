@@ -1,4 +1,11 @@
+
+
 # Docker
+
+## 0. README
+
+T아카데미의 도커 강의를 듣고 정리한 내용들입니다.
+
 ## 1. Tutorials
 
 `docker run -it ubuntu:latest echo "hello, world"`
@@ -95,4 +102,73 @@ DISTRIB_DESCRIPTION="Ubuntu 18.04 LTS"
 * 10명의 맥북이 있다면, 10개의 서로 다른 환경이 있지만, 하나의 이미지는 리눅스 환경에서 이 이미지를 사용할 때는 항상 같은 환경이라는 점을 보장할 수 있다.
 * 초강력한 포터블 앱이다. 어떤 애플리케이션을 실행하기 위한 다양한 파일을 모아두고, 이것만 실행하면 된다.
 * 재현성: 이미지로 만들면 어디든 공유가 가능하다. 여기서 되면 저기서도 된다.
+* 오버헤드가 크지 않다. 만약 있다면, scale out 등으로 해결한다. 성능면에서 가상머신과 크게 문제 없다.
+
+
+
+## 3. 실습하기
+
+### 3.1 Agenda
+
+* 컨테이너 실행하기 `run`
+* 컨테이너 목록 확인하기 `ps`
+* 컨테이너 중지하기 `stop`
+* 컨테이너 제거하기 `rm`
+* 컨테이너 로그보기 `logs`
+* 이미지 목록 확인하기 `images`
+* 이미지 다운로드하기 `pull`
+* 이미지 삭제하기 `rmi`
+* 네트워크 만들기 `network`
+* 볼륨 마운트 `-v`
+* Docker Compose
+
+
+
+### 3.2 Mac or Windows
+
+도커는 linux만 지원하기 때문에 MacOS와 Windows에 설치되는 Docker는 실제로 가상머신에 설치된다. MacOS는 `xhyve`를 사용하고 Windows는 `Hyper-V`를 사용한다.
+
+설치가 제대로 되었는지 아래의 명령어와 결과로 확인해보자.
+
+```
+$ docker version
+Client:
+ Version:      18.03.1-ce
+ API version:  1.37
+ Go version:   go1.9.5
+ Git commit:   9ee9f40
+ Built:        Thu Apr 26 07:13:02 2018
+ OS/Arch:      darwin/amd64
+ Experimental: false
+ Orchestrator: swarm
+
+Server:
+ Engine:
+  Version:      18.03.1-ce
+  API version:  1.37 (minimum version 1.12)
+  Go version:   go1.9.5
+  Git commit:   9ee9f40
+  Built:        Thu Apr 26 07:22:38 2018
+  OS/Arch:      linux/amd64
+  Experimental: true
+```
+
+
+
+![docker_environment](/Users/wisecow/Documents/GitHub/TodayILearned/Docker/images/docker_environment_01.jpg)
+
+### 3.3 컨테이너 실행하기
+
+`docker run [OPTIONS] IMAGE[:TAG|@DIGEST][]COMMAND] [ARG...]`
+
+|   옵션    |                          설명                          |
+| :-------: | :----------------------------------------------------: |
+|    -d     |       detached mode: 흔히 말하는 백그라운드 모드       |
+|    -p     |        호스트와 컨테이너의 포트를 연결 (포워딩)        |
+|    -v     |      호스트와 컨테이너의 디렉토리를 연결 (마운트)      |
+|    -e     |          컨테이너 내에서 사용할 환경변수 설정          |
+|  --name   |                   컨테이너 이름 설정                   |
+|   --rm    |           프로세스 종료시 컨테이너 자동 제거           |
+|    -it    | -i와 -t를 동시에 사용한 것으로 터미널 입력을 위한 옵션 |
+| --network |                     네트워크 연결                      |
 
