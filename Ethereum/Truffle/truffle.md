@@ -65,7 +65,41 @@ deployer는 migrations 과정을 간편하게 해주는 여러 메서드들을 �
 
 많은 컨트랙트를 배포하기 위해, 우리는 선택적으로 컨트랙트들로 구성된 배열, 혹은 배열들을 담고 있는 배열을 보낼 수도 있다. 또한 마지막 인수는 `gas` 그리고 `from` 과 같은 다른 트랜잭션 매개 변수뿐만 아니라 `overwrite`라는 키를 포함 할 수있는 선택적 개체입니다.
 
-덮어 쓰기를 false로 설정하면 배포자는 이미 배포 된 계약이 있을 경우 이 계약을 배포하지 않는다. 이는 외부 종속성에 의해 계약 주소가 제공되는 경우에 유용합니다.
+덮어 쓰기를 false로 설정하면 배포자는 이미 배포 된 계약이 있을 경우 이 계약을 배포하지 않는다. 이는 외부 종속성에 의해 계약 주소가 제공되는 경우에 유용하다.
+
+#### DEPLOYER.LINK(LIBRARY, DESTINATIONS)
+
+이미 배포된 라이브러리에 컨트랙트를 연결시켜준다. `destinations`는 하나의 컨트랙트가 될 수도 있고, 많은 컨트랙트의 배열이 될 수도 있다. 만약 링크된 라이브러리와 관계가 없는 destination이 있다면 무시된다.
+
+```
+// Deploy library LibA, then link LibA to contract B, then deploy B.
+deployer.deploy(LibA);
+deployer.link(LibA, B);
+deployer.deploy(B);
+
+// Link LibA to many contracts
+deployer.link(LibA, [B, C, D]);
+```
+
+#### DELPLOYER.THEN(FUNCTION() {...})
+
+프로미스처럼, 임의의 배포 스텝을 실행한다. 
+
+```
+var a, b;
+deployer.then(function() {
+  // Create a new version of A
+  return A.new();
+}).then(function(instance) {
+  a = instance;
+  // Get the deployed instance of B
+  return B.deployed();
+}).then(function(instance) {
+  b = instance;
+  // Set the new instance of A's address on B via B's setA() function.
+  return b.setA(a.address);
+});
+```
 
 
 
@@ -83,7 +117,7 @@ import할 때, 경로 지정 문제로 애를 많이 먹었다. `./`로 경로�
 
 * Cost gas (Ether)
 * Change the state of the network
-* Aren't processed immediately
+* Aren't processed immediately 
 * Won't expose a return value (only a transaction id)
 
 ### CALLS
@@ -96,6 +130,22 @@ import할 때, 경로 지정 문제로 애를 많이 먹었다. `./`로 경로�
 ## INTRODUCING ABSTRACTIONS
 
 이더리움 컨트랙트를 자바스크립트로 이용할 수 있는 것이 Contract abstractions이다. 컨트랙트와 쉽게 인터페이스할 수 있게 만든 Wrapper code라고 생각하면 된다. 이로써 우리는 엔진에 대한 이해를 하지 않고도 편하게 사용할 수 있다.  트러플은 이를 위해 자체적으로 [truffle-contract](https://github.com/trufflesuite/truffle-contract) 모듈을 사용한다. 
+
+
+
+## Truffle Test
+
+### ASSERTIONS
+
+`Assert.equal()`과 같이 사용하고 해당 함수는 `truffle/Assert.sol`라이브러리에 의해 제공된다. 이것은 디폴트로 존재하는 라이브러리고, 원한다면 자신만의 assertion 라이브러리를 포함시킬 수도 있다.
+
+### DEPLOYED ADDRESSES
+
+배포된 컨트랙트의 주소들은 `truffle/DeployedAddresses.sol`라이브러리를 통해 이용 가능하다. 이것은 Truffle에서 제공하며 Truffle의 클린 룸 환경에 대한 테스트를 제공하기 위해 각 제품군이 실행되기 전에 다시 컴파일되고 다시 연결된다. 이 라이브러리는 배포 된 모든 계약에 대해 다음과 같은 형태로 기능을 제공한다.
+
+`DeployedAddresses.<contract name>();`
+
+
 
 ## USING TRUFFLE DEVELOP AND THE CONSOLE
 
@@ -254,3 +304,10 @@ module.exports = {
 }
 ```
 
+
+
+## ERROR HANDLING
+
+`truffle console`명령어가 윈도우에서 에러를 일으킨다. `truffle.cmd console`명령어로 해당 에러를 수정했다. 
+
+`truffle console`일단 콘솔 내에 진입하면 명령어를 입력할 때 앞에 prefix로 `truffle`을 붙이면 안된다. 
