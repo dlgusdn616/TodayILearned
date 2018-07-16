@@ -69,6 +69,75 @@ DISTRIB_DESCRIPTION="Ubuntu 18.04 LTS"
   * 이미지는 파일들의 집합
   * 프로세스가 실행되는 환경도 결국 파일들의 집합
 
+도커의 파일 시스템은 레이어로 구성되어 있다.
+
+![docker_state](images/docker_state_01.jpeg)
+
+#### Git 설치하기
+
+`docker run -it ubuntu:16.04 --name git /bin/bash`
+
+```
+apt-get update
+apt-get install git -y
+git version
+```
+
+이렇게만 명령을 실행하고 컨테이너를 종료하면 상태가 저장되지 않는다. 도커를 종료한 후 다시 키면 git은 없을 것이다.
+
+도커를 실행한 후 새로운 파일을 만드는 등의 조작을 하면 상태 변화가 된 것이다. 예를 들어, `root`디렉토리에 `text.txt` 파일을 만든 후에 `docker diff` 를 실행하면 아래와 같은 결과가 나온다.
+
+```
+C /root
+A /root/test.txt
+```
+
+변경사항들이 출력되었음을 알 수 있다.
+
+마찬가지로 도커에 git을 설치한 후에 확인해보면 아래와 같은 결과를 볼 수 있다.
+
+```
+docker diff cdfe7bb9f550 | grep git | head -n 10
+A /etc/bash_completion.d/git-prompt
+A /usr/bin/git
+A /usr/bin/git-receive-pack
+A /usr/bin/git-shell
+A /usr/bin/git-upload-archive
+A /usr/bin/git-upload-pack
+A /usr/lib/git-core
+A /usr/lib/git-core/git
+A /usr/lib/git-core/git-add
+A /usr/lib/git-core/git-add--interactive
+```
+
+이제는 변화된 상태를 이미지에 저장시키기 위해 아래와 같이 명령어를 입력해보자.
+
+```
+docker commit cdfe7bb9f550 ubuntu:git
+ha256:bd3138014eaeb8d1651a77943cc4635d94c3407e2ac7d98a4ef7ab72b599f839
+```
+
+이렇게 이미지를 생성한 후에 아래와 같이 커맨드와 함께 결과를 확인해보자. 출력값이 hash256값인 것을 알 수 있다.
+
+```
+docker images | grep git
+ubuntu git bd3138014eae 9minutes ago 250MB
+```
+
+생성한 이미지를 이용해 도커를 실행하면 아래와 같다. (/#은 도커 안에서 실행되고 있음을 의미한다.)
+
+```
+docker run -it ubuntu:git bash
+/# git version
+git version 2.7.4
+```
+
+새로운 컨테이너가 생성되는데 이 컨테이너는 git을 포함하고 있다.
+
+레이어를 실행하고 
+
+
+
 ### 2.3 도커 서버와 클라이언트
 
 * 리눅스 머신
@@ -381,6 +450,88 @@ imgaes 명령어를 통해 얻은 이미지 목록에서 이미지 ID를 입력�
 만들어 놓은 mysql에 네트워크를 추가한다.
 
 `docker network connect app-network mysql`
+
+#### run with network
+
+워드프레스를 app-network에 속하게 생성하고 mysql을 IP가 아닌 mysql로 바로 접근한다.
+
+```
+docker run -d -p 8080:80 \
+	--network=app-network \
+	-e WORDPRESS_DB_HOST=mysql \
+	-e WORDPRESS_DB_NAME=wp \
+	-e WORDPRESS_DB_USER=wp \
+	-e WORDPRESS_DB_PASSWORD=wp \
+	wordpress
+```
+
+같은 네트워크에 속해 있으면 상대 컨테이너의 이름을 DNS로 조회하여 바로 접근할 수 있다. 하나의 컨테이너는 여러개의 network에 속할 수 있으며 `Docker Swarm`  같은 클러스터에서 편리하게 사용할 수 있다.
+
+
+
+## 3. Docker Compose
+
+### 3.1 설치 확인
+
+```
+$ docker-compose version
+docker-compose version 1.21.1, build 5a3f1a3
+docker-py version: 3.3.0
+CPython version: 3.6.4
+OpenSSL version: OpenSSL 1.0.2o  27 Mar 2018
+```
+
+
+
+### 3.2 docker-compose.yml
+
+볼륨 마운트 옵션을 넣어서 wordpress와 database를 만든다. 원래 옵션으로 주어야 했던 것들을 미리 기술했다는 것을 알 수 있다. 인덴트에 매우 민감한 파일로 들여쓰기 간격에 주의하도록 한다. 기존에 작성되어 있는 양식으로 작성하는 것이 좋을 듯하다.
+
+아래 volumes이라는 옵션은 호스트 안의 특정 디렉토리를 컨테이너에 직접 연결하겠다는 뜻이다. 
+
+```
+version: '2'
+
+services:
+   db:
+     image: mysql:5.7
+     volumes:
+       - ./mysql:/var/lib/mysql
+     restart: always
+     environment:
+       MYSQL_ROOT_PASSWORD: wordpress
+       MYSQL_DATABASE: wordpress
+       MYSQL_USER: wordpress
+       MYSQL_PASSWORD: wordpress
+   wordpress:
+     image: wordpress:latest
+     volumes:
+       - ./wp:/var/www/html
+     ports:
+       - "8000:80"
+     restart: always
+     environment:
+       WORDPRESS_DB_HOST: db:3306
+       WORDPRESS_DB_PASSWORD: wordpress
+```
+
+명령어를 실행 후에 디렉토리를 조회해보니, 홈디렉토리에 `mysql` 디렉토리가 생성되었음을 알 수 있었고 디렉토리 안에는 mysql 컨테이너의 정보가 담겨 있었다. 만약 volume을 주고 마운트를 하지 않게되면 도커가 종료되었을 때 db에 있는 데이터가 소멸된다. 컨테이너가 사라지더라도 디렉토리는 사라지지 않기 때문에, 후에 다시 컨테이너를 실행시킬 때 데이터를 보존할 수 있다.
+
+#### up
+
+docker compose를 이용하여 mysql, wordpress를 실행한다.
+
+`docker-compose up -d`
+
+`docker-compose -f test.yml up` 과 같이 -f 옵션으로 `docker-compose.yml` 파일명과 다르게 사용할 수 있다.
+
+일반적으로 docker-compose는 디렉토리 내에 하나만 존재하는 것이 관리상 바른 모델이라 할 수 있다.
+
+#### down
+
+docker-compose를 이용하여 mysql, wordpress를 종료한다.
+
+`docker-compose down`
 
 
 
