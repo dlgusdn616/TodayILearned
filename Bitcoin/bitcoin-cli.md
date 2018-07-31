@@ -2,7 +2,7 @@
 
 ### Configuring the Bitcoin Core Node
 
-*  비트코인 코어는 실행할 때마다 Configuration 파일을 찾는다.
+* 비트코인 코어는 실행할 때마다 Configuration 파일을 찾는다.
 
 * 비트코인 Configuration 위치는 `bitcoind -printtoconsole` 명령어로 데몬의 실행내역을 확인해보면 알 수 있다.
 
@@ -202,5 +202,102 @@
 
 * Connection options:
   * -addnode=<ip>
-    
-
+    -특정 노드에 연결하고 가능한 연결을 유지하려 한다.
+  * -bind<addr>
+    주어진 주소를 묶고 항상 해당 주소들에 대해서는 요청대기 상태로 기다린다. IPv6를 위해 [host]:port 노테이션을 사용한다.
+  * -connect=<ip>
+    오직 특정 노드(들)에게만 연결을 시도한다; -noconnect 또는 -connect=0 이 따로 사용된다면 자동 연결을 차단한다.
+  * -discover
+    Discover own IP addresses (디폴트: 1 when listening and no -externalip or -proxy)
+  * -dns
+    -addnode, -seednode and -connect를 위해 DNS 룩업을 허용한다. 
+  * -dnsseed
+    피어들의 주소를 DNS 룩업에서 쿼리(if low on addresses) 한다. (디폴트: 1 unless -connect/-noconnect)
+  * -externalip=<ip>
+    나만의 퍼블릭 주소를 지정
+  * -listen
+    바깥에서의 연결을 받아들인다. (디폴트: 1 if no -proxy or -connect/-noconnect)
+  * -listenonion 
+    자동으로 Tor 히든 서비스를 생성한다 (디폴트: 1)
+  * -maxconnections=<n>
+    최대 <n>개의 피어와의 연결을 유지한다. (디폴트: 125)
+  * -maxreceivebuffer=<n>
+    커넥션별 최대 수신 버퍼 크기, <n> * 1000 bytes (default: 5000)
+  * -maxsendbuffer=<n>
+    커넥션별 최대 전송 버퍼 크기, <n> * 1000 bytes (default: 1000)
+  * -maxtimeadjustment
+    Maximum allowed median peer time offset adjustment. Local perspective of time may be influenced by peers forward or backward by this amount. (default: 4200 seconds)
+  * -onion=[ip:port]
+    Tor 히든 서비스들 너머의 피어들에게 도달하기 위해 분리된 SOCKS5 프록시를 사용한다. (디폴트: -proxy)
+  * -onlynet=<net>
+    네트워크 <net> 내의 노드들에만 연결한다. (ipv4, ipv6 or onion)
+  * -permitbaremultisig
+    Relay non-P2SH multisig (디폴트: 1)
+  * -peerbloomfilters
+    블록들과 트랜잭션들을 필터링하는 블룸 필터를 지원한다. (디폴트: 1)
+  * -port=<port>
+    <port>에서 연결을 위한 수신 대기를 한다. (디폴트: 8333 or testnet: 18333)
+  * -proxy=[ip:port]
+    SOCKS5 프록시를 통해 연결한다.
+  * -proxyrandomize
+    Randomize credentials for every proxy connection. This enables Tor stream isolation (디폴트: 1)
+* Wallet options:
+  * -disablewallet
+    지갑을 로드하지 않고 wallet RPC 콜 또한 허락하지 않는다.
+  * -keypool=<n>
+    키 풀 사이즈를 <n>으로 설정 (디폴트: 100)
+  * -fallbackfee=<amt>
+    A fee rate (in BTC/kB) that will be used when fee estimation has insufficient data (디폴트: 0.0002)
+  * -mintxfee=<amt>
+    Fees (in BTC/kB) smaller than this are considered zero fee for transaction creation (디폴트: 0.0001)
+  * -paytxfee=<amt>
+    Fee (in BTC/kB) to add to transactions you send (디폴트: 0.00)
+  * -rescan 
+    프로그램 시작 시, 누락된 지갑 트랜잭션이 블록체인 내에 존재하는지 다시 스캔
+  * salvagewallet 
+    Attempt to recover private keys from a corrupt wallet on startup
+  * -txconfirmtarget=<n>
+    If paytxfee is not set, include enough fee so transactions begin confirmation on average within n blocks (디폴트: 6)
+  * -wallet=<file>
+    Specify wallet file (within data directory) (디폴트: wallet.dat)
+  * -walletbroadcast
+    Make the wallet broadcast transactions (디폴트: 1)
+* ZeroMQ notification options:
+* Debugging/Testing options:
+  * -uacomment=<cmt>
+    Append comment to the user agent string
+  * -printtoconsole
+    Send trace/debug info to console instead of debug.log file
+* Chain Selection options:
+  * -testnet
+* Node relay options:
+  * -bytespersigop
+    Equivalent bytes per sigop in transactions for relay and mining (디폴트: 20)
+  * -datacarrier
+    Relay and mine data carrier transactions (디폴트: 1)
+  * -datacarriersize
+    Maximum size of data in data carrier transactions we relay and mine (디폴트: 83)
+  * -mempoolreplacement
+    Enable transaction replacement in the memory pool (디폴트: 1)
+* Block creation options:
+  * -blockmaxweight=<n>
+    Set maximum BIP141 block weight (디폴트: 3000000)
+  * -blockmaxsize=<n>
+    Set maximum block size in bytes (디폴트: 750000)
+* RPC server options:
+  * -server
+    Accept command line and JSON-RPC commands
+  * -rest
+    Accept public REST requests (디폴트: 0)
+  * -rpccookiefile=<loc>
+    Location of the auth cookie (디폴트: data dir)
+  * -rpcuser=<user> -rpcpassword=<pw>
+    Username for JSON-RPC connections
+    Password for JSON-RPC connections
+  * -rpcport=<port>
+    Listen for JSON-RPC connections on <port> (디폴트: 8332 or testnet: 18332)
+  * -rpcallowip=<ip>
+    Allow JSON-RPC connections from specified source. Valid for <ip> are a single IP (e.g. 1.2.3.4), a network/netmask (e.g. 1.2.3.4/255.255.255.0) or a network/CIDR (e.g. 1.2.3.4/24). This option can be specified multiple times
+  * -rpcthreads=<n>
+    Set the number of threads to service RPC calls (디폴트: 4)
+* UI Options:
