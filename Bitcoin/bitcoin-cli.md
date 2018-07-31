@@ -151,13 +151,56 @@
   * -alertnotify=<cmd>
     지정된 명령 또는 스크립트를 실행하여 노드의 소유자(일반적으로 전자 메일)에 경고를 전송. 관련된 경고가 도착하거나 상당한 길이의 포크를 발견했을 때 발생한다.
     `alertnotify=echo %s | mail -s "Bitcoin Alert" admin@gmail.com`  와 같이 사용한다. %s는 실행시 경고 메시지로 대체될 것이다.
+
   * -conf=<file>
     config 파일 위치를 변경해서 사용할 수 있다. 위치의 경우 디폴트로 앞에 datadir의 위치가 담기게 된다. 따라서 디폴트는 `bitcoin.conf` 가 되는 것이고 앞에는 `/home/user/.bitcoin` 이 디폴트로 삽입된다고 생각하면 된다.
-  * -blocksdir=<dir>
-    블록들이 저장될 디렉토리를 선택한다. (디폴트: <datadir>/blocks) 첫 실행시 `Default data directory /home/user/.bitcoin` 와 같은 결과가 나왔으므로 <datadir>는 `/home/user/.bitcoin`로 대체될 것이다.
+
   * -datadir=<dir>
     데이터가 저장될 디렉토리를 선택한다.
+
+  * -blocksdir=<dir>
+    블록들이 저장될 디렉토리를 선택한다. (디폴트: <datadir>/blocks) 첫 실행시 `Default data directory /home/user/.bitcoin` 와 같은 결과가 나왔으므로 <datadir>는 `/home/user/.bitcoin`로 대체될 것이다.
+
   * -daemon
     백그라운드로 데몬을 실행한다.
+
   * -dbcache=<n>
     데이터베이스 캐시 사이즈를 메가바이트 단위로 설정한다. (4 to 16384, default: 450)
+
+  * -maxmempool=<n>
+    트랜잭션 메모리 풀 사이즈를 <n>메가바이트 미만으로 잡는다. (디폴트는300).
+
+  * -maxorphantx=<n>
+    최대 <n>개의 unconnectable 트랜잭션들을 메모리에 유지한다. (디폴트는 100).
+
+  * -maxpoolexpiry=<n>
+    메모리 풀에 <n> 시간 보다 길게 보관되어 있는 트랜잭션들을 보관하지 않는다. (디폴트는 336).
+
+  * -par=<n>
+    스크립트 검증 스레드 개수를 지정한다. (-1 부터 16까지, 0 = auto, <0 = leave that many cores free, default: 0)
+
+  * -persistmempool
+    셧다운 시에 멤풀을 저장하고 재시작 시 로드할지를 정할 것인지의 여부 (디폴트: 1)
+
+  * -prune=<n>
+    이전 블록을 삭제하여 디스크 공간을 절약할 수 있다. 특정 블록을 삭제하기 위해 pruneblockchain RPC를 호출할 수도 있고, target size를 MiB로 정하여 자동으로 오래된 블록을 pruning하는 방식을 택할 수도 있다. 이 모드는 -txindex 옵션과 -rescan옵션에는 호환되지 않는다. 
+
+    > 이 옵션을 사용하다 보면 전체 블록체인을 다시 다운로드 받아야 하는 상황이 생길 수 있으니 충분히 주의하도록 한다.
+
+    디폴트는 0: disable pruning blocks, 1 = allow manual pruning via RPC, >550 = automatically prune block files to stay under the specified target size in MiB
+
+  * -reindex
+    체인 상태와 디스크 내의 blk*.dat 파일에 저장되어 있는 블록 인덱스를 다시 빌드한다.
+
+  * -reindex-chainstate
+    현재 인덱싱된 블록들로부터 체인 상태를 다시 빌드한다.
+
+  * -txindex
+    모든 트랜잭션의 인덱스를 유지한다. 이 옵션을 사용하면  getrawtransaction rpc로 모든 tx에 접근이 가능하다. Full-index node라고 한다.
+
+
+
+* Connection options:
+  * -addnode=<ip>
+    
+
