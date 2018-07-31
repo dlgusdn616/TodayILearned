@@ -301,3 +301,8 @@
   * -rpcthreads=<n>
     Set the number of threads to service RPC calls (디폴트: 4)
 * UI Options:
+
+비트코인 코어는 사용자 월렛과 관련된 트랜잭션만을 포함한 데이터베이스를 빌드한다.
+
+* getrawtransaction 명령어 등을 트랜잭션 디코딩 하고 싶다면 configuration 파일에 txindex=1을 설정하고 `bitocind reindex`로 실행한다.
+
