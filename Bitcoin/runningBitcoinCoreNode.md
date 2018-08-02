@@ -458,3 +458,50 @@ walletprocesspsbt "psbt" ( sign "sighashtype" bip32derivs )
 getzmqnotifications
 ```
 
+
+
+### Bitcoin RPC
+
+비트코인 RPC를 이용하는 도중 여러가지 문제가 발생했다. 가장 먼저, bitcoin.conf 파일에 어떠한 포트넘버를 적든지간에 에러가 발생했다.
+
+어떻게 하면 이 에러를 해결하여 올바르게 RPC 연결을 할 수 있는지를 고민하며 여러가지 시도를 해보았다. 
+
+비트코인데몬이 현재 어떤 포트를 열어두었는지 확인하기 위해 아래의 명령어로 알아보았다.
+
+```shell
+$ netstat -lp | grep bitcoind
+(Not all processes could be identified, non-owned process info
+ will not be shown, you would have to be root to see it all.)
+tcp        0      0 *:8333                  *:*                     LISTEN      5190/bitcoind   
+tcp6       0      0 [::]:8333               [::]:*                  LISTEN      5190/bitcoind   
+tcp6       0      0 [::]:18332              [::]:*                  LISTEN      5190/bitcoind   
+```
+
+그러나 여전히 8333으로 접근하는 것이 허용되지 않았다. bitcoin.conf 파일에 rpc 포트관련 옵션을 일체 주지 않고 비트코인 데몬을 실행한 후에 다시 동일한 명령어를 실행해보았다.
+
+```shell
+$ netstat -lp | grep bitcoind
+(Not all processes could be identified, non-owned process info
+ will not be shown, you would have to be root to see it all.)
+tcp        0      0 *:8333                  *:*                     LISTEN      5488/bitcoind   
+tcp6       0      0 [::]:8332               [::]:*                  LISTEN      5488/bitcoind   
+tcp6       0      0 [::]:8333               [::]:*                  LISTEN      5488/bitcoind   
+
+```
+
+이 상태에서 8332 포트로 연결하는 아래와 같은 소스코드를 실행시켜보았더니 동작을 한다.
+
+```shell
+// all config options are optional
+var client = new bitcoin.Client({
+  host: 'localhost',
+  port: 8332,
+  user: 'username',
+  pass: 'password',
+  timeout: 30000
+});
+```
+
+그 이외의 소스코드도 정상 동작을 하는지 확인해보는 작업을 진행할 예정이고, 다른 방식으로 연결하는 방법도 고민을 해볼 것이다. 아래의 링크를 확인하여 진행해보도록 한다.
+
+[node-bitcoin](https://github.com/freewil/node-bitcoin) 
